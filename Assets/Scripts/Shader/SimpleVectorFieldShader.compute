@@ -1,0 +1,27 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+#include "SimplexNoise2D.cginc"
+
+struct Particle
+{
+    float3 pos;
+    float3 vel;
+};
+
+float gainX;
+float gainY;
+float gainZ;
+float A;
+float f;
+float time;
+float particleCount;
+
+RWStructuredBuffer<Particle> ParticleBuffer;
+
+[numthreads(64,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    ParticleBuffer[id.x].vel.x += gainX * snoise(float2(ParticleBuffer[id.x].pos.z, ParticleBuffer[id.x].pos.y)) * A * sin(f * time);
+    ParticleBuffer[id.x].vel.y += gainY * ParticleBuffer[id.x].pos.y * A * sin(f * time);
+    ParticleBuffer[id.x].vel.z += gainZ * snoise(float2(ParticleBuffer[id.x].pos.x, ParticleBuffer[id.x].pos.z)) * A * sin(f * time);
+}
