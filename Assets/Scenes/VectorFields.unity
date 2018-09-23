@@ -113,6 +113,72 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &238564636
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 238564638}
+  - component: {fileID: 238564637}
+  m_Layer: 0
+  m_Name: Point Light
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!108 &238564637
+Light:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 238564636}
+  m_Enabled: 1
+  serializedVersion: 8
+  m_Type: 2
+  m_Color: {r: 1, g: 0.61922914, b: 0.30588233, a: 1}
+  m_Intensity: 1
+  m_Range: 15.21
+  m_SpotAngle: 30
+  m_CookieSize: 10
+  m_Shadows:
+    m_Type: 0
+    m_Resolution: -1
+    m_CustomResolution: -1
+    m_Strength: 1
+    m_Bias: 0.05
+    m_NormalBias: 0.4
+    m_NearPlane: 0.2
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_Lightmapping: 4
+  m_LightShadowCasterMode: 0
+  m_AreaSize: {x: 1, y: 1}
+  m_BounceIntensity: 1
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
+  m_ShadowRadius: 0
+  m_ShadowAngle: 0
+--- !u!4 &238564638
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 238564636}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 6.3, y: 10.67, z: 4.2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &534669902
 GameObject:
   m_ObjectHideFlags: 0
@@ -125,6 +191,7 @@ GameObject:
   - component: {fileID: 534669903}
   - component: {fileID: 534669909}
   - component: {fileID: 534669906}
+  - component: {fileID: 534669907}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -161,7 +228,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 16.601528
+  field of view: 28
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -185,13 +252,13 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 534669902}
-  m_LocalRotation: {x: 0.014256831, y: 0.9805466, z: 0.1796359, w: -0.077821344}
-  m_LocalPosition: {x: 1.6643996, y: -0.52175283, z: 4.112418}
+  m_LocalRotation: {x: 0.31328535, y: 0.6461002, z: -0.3049132, w: 0.62564754}
+  m_LocalPosition: {x: 2.39, y: 6.52, z: 6.07}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 99.82501, y: 133.59, z: 313.785}
+  m_LocalEulerAnglesHint: {x: 51.815002, y: 92.892006, z: 2.1590002}
 --- !u!114 &534669906
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -204,6 +271,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   profile: {fileID: 11400000, guid: 8650704d2a85549749581e4cce21d195, type: 2}
+--- !u!114 &534669907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 534669902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d59ae4f317f9b4f8b8d64f71768aaea6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sourceTexture: {fileID: 0}
+  _alphaSupport: 0
+  _blitShader: {fileID: 4800000, guid: 1357bcacfdfbc48b290065349adbfb93, type: 3}
 --- !u!114 &534669909
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -218,24 +299,25 @@ MonoBehaviour:
   posX: 0
   posY: 0
   posZ: 0
-  scaleX: 2
+  scaleX: 10
   scaleY: 2
-  scaleZ: 1
-  resX: 1000
-  resY: 1000
-  resZ: 10
-  tailFactor: 0
-  noiseFactor: 0.1
-  noiseScale: 2306.16
-  noiseTimeScale: 0.03
-  gradientFactor: 1e-12
+  scaleZ: 10
+  tailFactor: 0.9
+  boundaryForceFactor: 1.25
+  vNoiseFactor: 22.46
+  sNoiseFactor: 0.26
+  vNoiseTimeScale: 0.02
+  sNoiseTimeScale: 0.02
+  gradientFactor: 15.4
   imageStackFolderPath: /Assets/Textures/Stack
-  alphaFactor: 1.57
-  redFactor: -0.3
-  greenFactor: -0.09
-  blueFactor: -0.1
-  delta: 1000000
-  seedShift: 27.19
+  alphaFactor: 1
+  delta: 1.26
+  seedShift: 1
+  voronoiFreq: 0.6
+  voronoiAmp: 11.08
+  voronoiJitter: 0.1
+  voronoiOctaves: 1
+  cameraSpeed: 0.5
   material: {fileID: 2100000, guid: 460af7483ea674a1381e0a7e8f89ae7f, type: 2}
   computeShader: {fileID: 7200000, guid: 2ae322214a29e4eb5ac1153ce1c45796, type: 3}
 --- !u!1 &1212915235

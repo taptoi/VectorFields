@@ -15,27 +15,32 @@ public class VectorField : MonoBehaviour
     public int scaleX = 1;
     public int scaleY = 1;
     public int scaleZ = 1;
-    public int resX = 100;
-    public int resY = 100;
-    public int resZ = 100;
+    //public int resX = 100;
+    //public int resY = 100;
+    //public int resZ = 100;
     public float tailFactor = 0.5f;
-    public float noiseFactor = 0.005f;
-    public float noiseScale = 1.0f;
-    public float noiseTimeScale = 0.1f;
+    public float boundaryForceFactor = 0.005f;
+    public float vNoiseFactor = 1;
+    public float sNoiseFactor = 1;
+    public float vNoiseTimeScale = 0.1f;
+    public float sNoiseTimeScale = 0.1f;
     public float gradientFactor = 0.5f;
     public string imageStackFolderPath;
     public float alphaFactor = 0.1f;
-    public float redFactor = 0.1f;
-    public float greenFactor = 0.1f;
-    public float blueFactor = 0.1f;
+    //public float redFactor = 0.1f;
+    //public float greenFactor = 0.1f;
+    //public float blueFactor = 0.1f;
     public float delta = 1.0f;
     public float seedShift = 555f;
+    public float voronoiFreq = 0.1f;
+    public float voronoiAmp = 5.0f;
+    public float voronoiJitter = 1.1f;
+    public int voronoiOctaves = 1;
+    public float cameraSpeed = 0.5f;
 
 
     private float[,,] fieldMatrix;
     private Mesh fieldMesh;
-
-    private Vector2 cursorPos;
 
     // struct
     struct Particle
@@ -56,7 +61,7 @@ public class VectorField : MonoBehaviour
     /// <summary>
     /// Number of Particle created in the system.
     /// </summary>
-    private int particleCount = 512000;
+    private int particleCount = 128000;
 
     /// <summary>
     /// Material used to draw the Particle on screen.
@@ -81,7 +86,7 @@ public class VectorField : MonoBehaviour
     /// <summary>
     /// Buffer holding the gradient vectors.
     /// </summary>
-    ComputeBuffer gradientBuffer;
+    //ComputeBuffer gradientBuffer;
 
     /// <summary>
     /// Number of particle per warp.
@@ -102,12 +107,14 @@ public class VectorField : MonoBehaviour
     private const string dataFileName = "3DScanData.dat";
 
     private RenderTexture pastFrame;
-    private Material tailShaderMaterial; 
+    private Material tailShaderMaterial;
+    private Light mainLight;
 
 
     // Use this for initialization
     void Start()
     {
+        mainLight = FindObjectOfType<Light>();
         tailShaderMaterial = new Material(Shader.Find("Hidden/TailShader"));
         tailShaderMaterial.hideFlags = HideFlags.DontSave;
         pastFrame = new RenderTexture(Screen.width, Screen.height, 16);
@@ -121,28 +128,39 @@ public class VectorField : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        transform.RotateAround(new Vector3(scaleX / 2, scaleY / 2, scaleZ / 2), 
+                               Vector3.up, 
+                               cameraSpeed * Time.deltaTime);
 
-        float[] mousePosition2D = { cursorPos.x, cursorPos.y };
+        //float[] mousePosition2D = { cursorPos.x, cursorPos.y };
 
         // Send datas to the compute shader
         computeShader.SetFloat("deltaTime", Time.deltaTime);
         computeShader.SetFloat("time", Time.time);
-        computeShader.SetFloat("noiseFactor", noiseFactor);
-        computeShader.SetFloat("noiseScale", noiseScale);
+        computeShader.SetFloat("boundaryForceFactor", boundaryForceFactor);
         computeShader.SetFloat("gradientFactor", gradientFactor);
-        computeShader.SetFloat("noiseTimeScale", noiseTimeScale);
-        computeShader.SetInt("resX", resX);
-        computeShader.SetInt("resY", resY);
-        computeShader.SetInt("resZ", resZ);
+        computeShader.SetFloat("vNoiseFactor", vNoiseFactor);
+        computeShader.SetFloat("sNoiseFactor", sNoiseFactor);
+        computeShader.SetFloat("vNoiseTimeScale", vNoiseTimeScale);
+        computeShader.SetFloat("sNoiseTimeScale", sNoiseTimeScale);
+
+        //computeShader.SetInt("resX", resX);
+        //computeShader.SetInt("resY", resY);
+        //computeShader.SetInt("resZ", resZ);
         computeShader.SetInt("scaleX", scaleX);
         computeShader.SetInt("scaleY", scaleY);
         computeShader.SetInt("scaleZ", scaleZ);
         computeShader.SetFloat("delta", delta);
         computeShader.SetFloat("seedShift", seedShift);
+        computeShader.SetFloat("voronoiFreq", voronoiFreq);
+        computeShader.SetFloat("voronoiAmp", voronoiAmp);
+        computeShader.SetFloat("voronoiJitter", voronoiJitter);
+        computeShader.SetInt("voronoiOctaves", voronoiOctaves);
 
         // Update the Particles
         computeShader.Dispatch(mComputeShaderKernelID, mWarpCount, 1, 1);
     }
+
 
     void InitComputeShader()
     {
@@ -153,10 +171,17 @@ public class VectorField : MonoBehaviour
 
         for (int i = 0; i < particleCount; i++)
         {
-            float x = UnityEngine.Random.value * scaleX;
-            float y = UnityEngine.Random.value * scaleX;
-            float z = UnityEngine.Random.value * scaleZ;;
-            Vector3 xyz = new Vector3(x, y, z);
+            var q = Quaternion.Euler(UnityEngine.Random.value * 360,
+                                     UnityEngine.Random.value * 360,
+                                     UnityEngine.Random.value * 360);
+            float r = UnityEngine.Random.value * scaleX / 50;
+            //float x = UnityEngine.Random.value * scaleX;
+            //float y = UnityEngine.Random.value * scaleY;
+            //float z = UnityEngine.Random.value * scaleZ;
+            Vector3 c = new Vector3(scaleX / 2, scaleY / 2, scaleZ / 2);
+            Vector3 xyz = new Vector3(1, 1, 1);
+            // Rotate and scale vector within a sphere and center
+            xyz = q * xyz * r + c; 
             //xyz.Normalize();
 
 
@@ -169,12 +194,12 @@ public class VectorField : MonoBehaviour
             particleArray[i].velocity.z = 0;
 
             // Initial life value
-            particleArray[i].life = UnityEngine.Random.value * 50;
+            particleArray[i].life = 50 + UnityEngine.Random.value * 50;
         }
 
         // create compute buffers
         particleBuffer = new ComputeBuffer(particleCount, SIZE_PARTICLE);
-        gradientBuffer = new ComputeBuffer(resZ * resY * resX, SIZE_GRADIENT);
+        //gradientBuffer = new ComputeBuffer(resZ * resY * resX, SIZE_GRADIENT);
 
         particleBuffer.SetData(particleArray);
         //gradientBuffer.SetData(grads.Cast<SerializableVector3>()
@@ -188,16 +213,25 @@ public class VectorField : MonoBehaviour
         computeShader.SetBuffer(mComputeShaderKernelID, "particleBuffer", particleBuffer);
         material.SetBuffer("particleBuffer", particleBuffer);
 
-        computeShader.SetBuffer(mComputeShaderKernelID, "gradientBuffer", gradientBuffer);
+        //computeShader.SetBuffer(mComputeShaderKernelID, "gradientBuffer", gradientBuffer);
     }
 
     void OnRenderObject()
     {
         material.SetPass(0);
         material.SetFloat("_a", alphaFactor);
-        material.SetFloat("_r", redFactor);
-        material.SetFloat("_g", greenFactor);
-        material.SetFloat("_b", blueFactor);
+        //material.SetFloat("_r", redFactor);
+        //material.SetFloat("_g", greenFactor);
+        //material.SetFloat("_b", blueFactor);
+        material.SetFloat("_lightRange", mainLight.range);
+        material.SetFloat("_lightIntensity", mainLight.intensity);
+        material.SetFloat("_lightX", mainLight.transform.position.x);
+        material.SetFloat("_lightY", mainLight.transform.position.y);
+        material.SetFloat("_lightZ", mainLight.transform.position.z);
+        material.SetFloat("_lightR", mainLight.color.r);
+        material.SetFloat("_lightG", mainLight.color.g);
+        material.SetFloat("_lightB", mainLight.color.b);
+
         Graphics.DrawProcedural(MeshTopology.Points, 1, particleCount);
     }
 
@@ -217,8 +251,8 @@ public class VectorField : MonoBehaviour
     {
         if (particleBuffer != null)
             particleBuffer.Release();
-        if (gradientBuffer != null)
-            gradientBuffer.Release();
+        //if (gradientBuffer != null)
+            //gradientBuffer.Release();
         if (tailShaderMaterial != null)
             DestroyImmediate(tailShaderMaterial);
     }

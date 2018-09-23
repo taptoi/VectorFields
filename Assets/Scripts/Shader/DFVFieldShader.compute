@@ -2,6 +2,7 @@
 
 #include "UnityCG.cginc"
 #include "SimplexNoise3D.cginc"
+#include "SimplexNoise4D.cginc"
 #include "GPUVoronoiNoise4D.cginc"
 
  // Particle's data
@@ -15,25 +16,31 @@ struct Particle
 // Particle's data, shared with the shader
 RWStructuredBuffer<Particle> particleBuffer;
 
-RWStructuredBuffer<float3> gradientBuffer;
+//RWStructuredBuffer<float3> gradientBuffer;
 
 
 // Variables set from the CPU
 float deltaTime;
 float time;
-int resX;
-int resY;
-int resZ;
+//int resX;
+//int resY;
+//int resZ;
 int scaleX;
 int scaleY;
 int scaleZ;
 float gradientFactor;
-float noiseFactor;
+float boundaryForceFactor;
+float vNoiseFactor;
+float sNoiseFactor;
 float noiseScale;
-float noiseTimeScale;
+float vNoiseTimeScale;
+float sNoiseTimeScale;
 float delta;
 float seedShift;
-int octaves = 1;
+float voronoiFreq;
+float voronoiAmp;
+float voronoiJitter;
+int voronoiOctaves;
 
 // Hash function from H. Schechter & R. Bridson, goo.gl/RXiKaH
 uint Hash(uint s)
@@ -121,10 +128,19 @@ float divergence(float left,
 }
 
 
-float vornoise(float4 p, int oct)
+float vornoise(float4 p)
 {
-    float2 ns = inoise(p, 0.1);
+    float2 ns = fBm_F1_F0(p, voronoiOctaves, voronoiJitter, voronoiFreq, voronoiAmp);
     return length(ns);
+}
+
+float gauss(float x)
+{
+    float a = 3.0;
+    float b = 0.02;
+    float c = 0.71;
+    return a * exp(-1 * pow((b * x * x * x), 3)) / c - 4.2;
+
 }
 
 
@@ -137,115 +153,31 @@ void DFVField(uint3 id : SV_DispatchThreadID)
     float3 p = float3(px, py, pz);
     particleBuffer[id.x].life -= deltaTime;
 
-    // Divergence Free Vector field with Voronoi Noise:
-    /*
-    float n_1 = fBm_F0(float4(p, 1), octaves);
-    float n_2 = fBm_F0(float4(p, 1 + seedShift), octaves);
-    // Up
-    float n_up_1 = fBm_F0(float4(up(p, delta), 1), octaves);
-    float n_up_2 = fBm_F0(float4(up(p, delta), 1 + seedShift), octaves);
-    // Down
-    float n_dn_1 = fBm_F0(float4(down(p, delta), 1), octaves);
-    float n_dn_2 = fBm_F0(float4(down(p, delta), 1 + seedShift), octaves);
-    // Left
-    float n_lt_1 = fBm_F0(float4(left(p, delta), 1), octaves);
-    float n_lt_2 = fBm_F0(float4(left(p, delta), 1 + seedShift), octaves);
-    // Right
-    float n_rt_1 = fBm_F0(float4(right(p, delta), 1), octaves);
-    float n_rt_2 = fBm_F0(float4(right(p, delta), 1 + seedShift), octaves);
-    // Forward
-    float n_fw_1 = fBm_F0(float4(forward(p, delta), 1), octaves);
-    float n_fw_2 = fBm_F0(float4(forward(p, delta), 1 + seedShift), octaves);
-    // Back
-    float n_bc_1 = fBm_F0(float4(back(p, delta), 1), octaves);
-    float n_bc_2 = fBm_F0(float4(back(p, delta), 1 + seedShift), octaves);
-    */
-    /*
-    // Up
-    float n_up_1 = snoise(up(p, delta));
-    float n_up_2 = snoise(up(p, delta) + seedShift);
-    // Down
-    float n_dn_1 = snoise(down(p, delta));
-    float n_dn_2 = snoise(down(p, delta) + seedShift);
-    // Left
-    float n_lt_1 = snoise(left(p, delta));
-    float n_lt_2 = snoise(left(p, delta) + seedShift);
-    // Right
-    float n_rt_1 = snoise(right(p, delta));
-    float n_rt_2 = snoise(right(p, delta) + seedShift);
-    // Forward
-    float n_fw_1 = snoise(forward(p, delta));
-    float n_fw_2 = snoise(forward(p, delta) + seedShift);
-    // Back
-    float n_bc_1 = snoise(back(p, delta));
-    float n_bc_2 = snoise(back(p, delta) + seedShift);
-    */
-
     // Pos
-    float n_1 = snoise(0.001 * p);
-    float n_2 = vornoise(float4(p, noiseTimeScale * time + seedShift), octaves);
-
-    // Up
-    // float n_up_1 = snoise(0.001 * up(p, delta));
-    // float n_up_2 = snoise(0.001 * up(p, delta) + seedShift);
-
-    // float n_up_1 = vornoise(float4(up(p, delta), noiseTimeScale * time), octaves);
-    // float n_up_2 = vornoise(float4(up(p, delta), noiseTimeScale * time + seedShift), octaves);
+    float n_1 = vornoise(vNoiseFactor * float4(p, vNoiseTimeScale * time));
+    float n_2 = snoise4(sNoiseFactor * float4(p, sNoiseTimeScale * time + seedShift)); 
  
 
     // Down
-    float n_dn_1 = snoise(0.001 * down(p, delta));
-    //float n_dn_2 = snoise(0.001 * down(p, delta) + seedShift);
-    //float n_dn_1 = vornoise(float4(down(p, delta), noiseTimeScale * time), octaves);
-    float n_dn_2 = vornoise(float4(down(p, delta), noiseTimeScale * time + seedShift), octaves);
+    float n_dn_1 = vornoise(vNoiseFactor * float4(down(p, delta), vNoiseTimeScale * time));
+    float n_dn_2 = snoise4(sNoiseFactor * float4(down(p, delta * 10), sNoiseTimeScale * time));
 
 
     // Left
-    float n_lt_1 = snoise(0.001 * left(p, delta));
-    //float n_lt_2 = snoise(0.001 * left(p, delta) + seedShift);
-    //float n_lt_1 = vornoise(float4(left(p, delta), noiseTimeScale * time), octaves);
-    float n_lt_2 = vornoise(float4(left(p, delta), noiseTimeScale * time + seedShift), octaves);
-
-    // Right
-    // float n_rt_1 = snoise(0.001 * right(p, delta));
-    // float n_rt_2 = snoise(0.001 * right(p, delta) + seedShift);
-    // float n_rt_1 = vornoise(float4(right(p, delta), noiseTimeScale * time), octaves);
-    // float n_rt_2 = vornoise(float4(right(p, delta), noiseTimeScale * time + seedShift), octaves);
-
-    // Forward
-    // float n_fw_1 = snoise(0.001 * forward(p, delta));
-    // float n_fw_2 = snoise(0.001 * forward(p, delta) + seedShift);
-    // float n_fw_1 = vornoise(float4(forward(p, delta), noiseTimeScale * time), octaves);
-    // float n_fw_2 = vornoise(float4(forward(p, delta), noiseTimeScale * time + seedShift), octaves);
+    float n_lt_1 = vornoise(vNoiseFactor * float4(left(p, delta), vNoiseTimeScale * time));
+    float n_lt_2 = snoise4(sNoiseFactor * float4(left(p, delta * 10), sNoiseTimeScale * time));
 
     // Back
-    float n_bc_1 = snoise(0.001 * back(p, delta));
-    //float n_bc_2 = snoise(0.001 * back(p, delta) + seedShift);
-    //float n_bc_1 = vornoise(float4(back(p, delta), noiseTimeScale * time), octaves);
-    float n_bc_2 = vornoise(float4(back(p, delta), noiseTimeScale * time + seedShift), octaves);
+    float n_bc_1 = vornoise(vNoiseFactor * float4(back(p, delta), vNoiseTimeScale * time));
+    float n_bc_2 = snoise4(sNoiseFactor * float4(back(p, delta * 10), sNoiseTimeScale * time));
 
 
-    // Compute the vector field point:
-    /*float3 grad1 = gradient(n_up_1,
-                            n_dn_1,
-                            n_lt_1,
-                            n_rt_1,
-                            n_fw_1,
-                            n_bc_1, 
-                            delta);*/
     float3 grad1 = gradientOpt(n_1,
                                 n_lt_1,
                                 n_dn_1,
                                 n_bc_1, 
                                 delta);
-    /*float3 grad2 = gradient(n_up_2,
-                            n_dn_2,
-                            n_lt_2,
-                            n_rt_2,
-                            n_fw_2,
-                            n_bc_2, 
-                            delta);
-                            */
+
     float3 grad2 = gradientOpt(n_2,
                             n_lt_2,
                             n_dn_2,
@@ -254,10 +186,18 @@ void DFVField(uint3 id : SV_DispatchThreadID)
     float3 vf = cross(grad1, grad2);
 
 
-    float4 ns = snoise(float3(px + noiseScale, py + noiseScale, pz + noiseScale));
-    particleBuffer[id.x].velocity = 0.8 * particleBuffer[id.x].velocity + gradientFactor * 50 * vf;
-    particleBuffer[id.x].velocity.y += noiseFactor * ns.y * (sin(time * noiseTimeScale));
-    particleBuffer[id.x].velocity.z -= noiseFactor * ns.z;
+    //float4 ns = snoise(float3(px + noiseScale, py + noiseScale, pz + noiseScale));
+    float3 c = float3(scaleX / 2.0, scaleY / 2.0, scaleZ / 2.0);
+    float dcx = px - c.x;
+    float dcy = py - c.y;
+    float dcz = pz - c.z;
+
+    particleBuffer[id.x].velocity.x += boundaryForceFactor * gauss(dcx);
+    particleBuffer[id.x].velocity.y += boundaryForceFactor * gauss(dcy);
+    particleBuffer[id.x].velocity.z += boundaryForceFactor * gauss(dcz);
+
+    particleBuffer[id.x].velocity = 0.8 * particleBuffer[id.x].velocity + gradientFactor * vf;
+
     particleBuffer[id.x].position += particleBuffer[id.x].velocity * deltaTime;
 
 

@@ -54,7 +54,7 @@ float2 inoise(float4 P, float jitter)
 				d = dx * dx + dy * dy + dz * dz + dw * dw; // dijk1, dijk2 and dijk3, squared
 				
 				//Find the lowest and second lowest distances
-				for(n = 0; n < 3; n++)
+				/*for(n = 0; n < 3; n++)
 				{
 					if(d[n] < F[0])
 					{
@@ -65,7 +65,14 @@ float2 inoise(float4 P, float jitter)
 					{
 						F[1] = d[n];
 					}
-				}
+				}*/
+                for(n = 0; n < 3; n++)
+                {
+                    if(d[n] < F[0])
+                    {
+                        F[0] = d[n];
+                    }
+                }
 			}
 		}
 	}
@@ -74,10 +81,11 @@ float2 inoise(float4 P, float jitter)
 }
 
 // fractal sum, range -1.0 - 1.0
-float fBm_F0(float4 p, int octaves)
+float fBm_F0(float4 p, int octaves, float freq, float amp)
 {
-	float freq = _Frequency, amp = 0.5;
 	float sum = 0;	
+    float lacunarity = 1.1;
+    float gain = 1.1;
 	for(int i = 0; i < octaves; i++) 
 	{
 		float2 F = inoise(p * freq, _Jitter) * amp;
@@ -90,18 +98,20 @@ float fBm_F0(float4 p, int octaves)
 	return sum;
 }
 
-float fBm_F1_F0(float4 p, int octaves)
+float fBm_F1_F0(float4 p, int octaves, float jitter, float freq, float amp)
 {
-	float freq = _Frequency, amp = 0.5;
-	float sum = 0;	
+    float sum = 0;  
+    float lacunarity = 1.1;
+    float gain = 1.1;
 	for(int i = 0; i < octaves; i++) 
 	{
-		float2 F = inoise(p * freq, _Jitter) * amp;
+		float2 F = inoise(p * freq, jitter) * amp;
 		
-		sum += 0.1 + sqrt(F[1]) - sqrt(F[0]);
+		//sum += 0.1 + sqrt(F[1]) - sqrt(F[0]);
+        sum += 0.1 + sqrt(F[0]);
 		
-		freq *= _Lacunarity;
-		amp *= _Gain;
+        freq *= lacunarity;
+        amp *= gain;
 	}
-	return sum;
+	return (1.0 - sum);
 }

@@ -76,9 +76,17 @@ Material:
     - _SrcBlend: 1
     - _UVSec: 0
     - _ZWrite: 1
-    - _a: 1.57
+    - _a: 1
     - _b: -0.1
-    - _g: -0.09
+    - _g: -11.49
+    - _lightB: 0.30588233
+    - _lightG: 0.61922914
+    - _lightIntensity: 1
+    - _lightR: 1
+    - _lightRange: 15.21
+    - _lightX: 6.3
+    - _lightY: 10.67
+    - _lightZ: 4.2
     - _r: -0.3
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
