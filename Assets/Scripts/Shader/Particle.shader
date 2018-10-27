@@ -28,6 +28,7 @@
         #pragma vertex vert
         #pragma fragment frag
 
+
         #include "UnityCG.cginc"
 
         // Use shader model 3.0 target, to get nicer looking lighting
@@ -75,8 +76,9 @@
 
 
             // Position
-            //pos += vertex_id * Random(vertex_id) * 0.01 * 0.1 * life;
+
             o.position = UnityObjectToClipPos(float4(pos, 1.0));
+            o.position += vertex_id * 0.1;
             float dist = length(ObjSpaceViewDir(o.position));
             //float rnd = Random(vertex_id) * 0.1 * dist;
             //o.position.x -= 0.1 * dist % vertex_id * rnd;
@@ -85,7 +87,7 @@
 
             // Color
             // Distance to the light:
-            float lightDist = distance(o.position, float3(_lightX, _lightY, _lightZ));
+            float lightDist = distance(pos, float3(_lightX, _lightY, _lightZ));
             float r = clamp(_lightRange / lightDist  * _lightR * _lightIntensity, 0, 2);
             float g = clamp(_lightRange / lightDist * _lightG * _lightIntensity, 0, 2);
             float b = clamp(_lightRange / lightDist * _lightB * _lightIntensity, 0, 2);
@@ -99,7 +101,6 @@
 
         float4 frag(PS_INPUT i) : COLOR
         {
-            
             return i.color;
         }
 

@@ -138,9 +138,9 @@ Light:
   m_Enabled: 1
   serializedVersion: 8
   m_Type: 2
-  m_Color: {r: 1, g: 0.61922914, b: 0.30588233, a: 1}
+  m_Color: {r: 0.5311944, g: 0.6281341, b: 0.6509434, a: 1}
   m_Intensity: 1
-  m_Range: 15.21
+  m_Range: 1000
   m_SpotAngle: 30
   m_CookieSize: 10
   m_Shadows:
@@ -173,7 +173,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 238564636}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.3, y: 10.67, z: 4.2}
+  m_LocalPosition: {x: 6.3, y: -550, z: 200}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -228,7 +228,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 28
+  field of view: 64
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -252,13 +252,13 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 534669902}
-  m_LocalRotation: {x: 0.31328535, y: 0.6461002, z: -0.3049132, w: 0.62564754}
-  m_LocalPosition: {x: 2.39, y: 6.52, z: 6.07}
+  m_LocalRotation: {x: 0.76244336, y: 0.055169996, z: 0.15348831, w: 0.62616116}
+  m_LocalPosition: {x: 0, y: 2000, z: 129.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 51.815002, y: 92.892006, z: 2.1590002}
+  m_LocalEulerAnglesHint: {x: 69.7, y: 119.1, z: 127.2}
 --- !u!114 &534669906
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -299,25 +299,27 @@ MonoBehaviour:
   posX: 0
   posY: 0
   posZ: 0
-  scaleX: 10
-  scaleY: 2
+  scaleX: 1000
+  scaleY: 10
   scaleZ: 10
-  tailFactor: 0.9
-  boundaryForceFactor: 1.25
-  vNoiseFactor: 22.46
-  sNoiseFactor: 0.26
-  vNoiseTimeScale: 0.02
-  sNoiseTimeScale: 0.02
-  gradientFactor: 15.4
+  tailFactor: 0.85
+  boundaryForceFactor: 0
+  vNoiseFactor: 0.02
+  sNoiseFactor: 0.001
+  vNoiseTimeScale: 0.1
+  sNoiseTimeScale: 0.01
+  gradientFactor: 10
   imageStackFolderPath: /Assets/Textures/Stack
   alphaFactor: 1
-  delta: 1.26
-  seedShift: 1
-  voronoiFreq: 0.6
-  voronoiAmp: 11.08
-  voronoiJitter: 0.1
+  delta: 160
+  seedShift: 0.001
+  voronoiFreq: 0.0015
+  voronoiAmp: 3
+  voronoiJitter: 0
   voronoiOctaves: 1
-  cameraSpeed: 0.5
+  cameraSpeed: 0
+  focusDistance: 900
+  dof: 800
   material: {fileID: 2100000, guid: 460af7483ea674a1381e0a7e8f89ae7f, type: 2}
   computeShader: {fileID: 7200000, guid: 2ae322214a29e4eb5ac1153ce1c45796, type: 3}
 --- !u!1 &1212915235

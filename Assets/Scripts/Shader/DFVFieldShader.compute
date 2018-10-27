@@ -187,27 +187,31 @@ void DFVField(uint3 id : SV_DispatchThreadID)
 
 
     //float4 ns = snoise(float3(px + noiseScale, py + noiseScale, pz + noiseScale));
-    float3 c = float3(scaleX / 2.0, scaleY / 2.0, scaleZ / 2.0);
-    float dcx = px - c.x;
-    float dcy = py - c.y;
-    float dcz = pz - c.z;
+    //float3 c = float3(scaleX / 2.0, scaleY / 2.0, scaleZ / 2.0);
+    //float dcx = px - c.x;
+    //float dcy = py - c.y;
+    //float dcz = pz - c.z;
 
-    particleBuffer[id.x].velocity.x += boundaryForceFactor * gauss(dcx);
-    particleBuffer[id.x].velocity.y += boundaryForceFactor * gauss(dcy);
-    particleBuffer[id.x].velocity.z += boundaryForceFactor * gauss(dcz);
+    //particleBuffer[id.x].velocity.x += boundaryForceFactor * gauss(dcx);
+    //particleBuffer[id.x].velocity.y += boundaryForceFactor * gauss(dcy);
+    //particleBuffer[id.x].velocity.z += boundaryForceFactor * gauss(dcz);
 
-    particleBuffer[id.x].velocity = 0.8 * particleBuffer[id.x].velocity + gradientFactor * vf;
-
+    particleBuffer[id.x].velocity = 0.1 * particleBuffer[id.x].velocity + 1.0 * gradientFactor * vf;
+    particleBuffer[id.x].velocity.y += -0.05 * particleBuffer[id.x].position.y;
+    particleBuffer[id.x].velocity.x += -0.05 * particleBuffer[id.x].position.x;
+    particleBuffer[id.x].velocity.z += -0.05 * particleBuffer[id.x].position.z;
+    //particleBuffer[id.x].velocity.z += 0.1 / particleBuffer[id.x].position.z;
+    particleBuffer[id.x].velocity.z += -0.00001 * boundaryForceFactor * (1 + sin(0.01 * time)) * particleBuffer[id.x].position.z * particleBuffer[id.x].position.z * particleBuffer[id.x].position.y;
     particleBuffer[id.x].position += particleBuffer[id.x].velocity * deltaTime;
 
 
     if(particleBuffer[id.x].life < 0)
     {
-        particleBuffer[id.x].life = 50;
-        particleBuffer[id.x].position.x = Random(id.x) * scaleX;
-        particleBuffer[id.x].position.y = Random(id.x + 1) * scaleY;
-        particleBuffer[id.x].position.z = Random(id.x + 2) * scaleZ;
-        particleBuffer[id.x].velocity = 0;
+        particleBuffer[id.x].life = 20;
+        particleBuffer[id.x].position.x = floor(Random(id.x) * scaleX) * 0.5;
+        particleBuffer[id.x].position.y = Random(id.x + 1) *  scaleY;
+        particleBuffer[id.x].position.z = Random(id.x + 2) *  scaleZ;
+        particleBuffer[id.x].velocity = float3(0, 0, 2);
     }
 
 }

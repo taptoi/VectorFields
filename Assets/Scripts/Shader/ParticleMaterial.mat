@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: ParticleMaterial
-  m_Shader: {fileID: 4800000, guid: e75f7f8c705af4ea0a1888b830002aab, type: 3}
+  m_Shader: {fileID: 4800000, guid: c31bf04c85a484a9b8f9ae1d56c771b3, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -78,15 +78,17 @@ Material:
     - _ZWrite: 1
     - _a: 1
     - _b: -0.1
+    - _dof: 800
+    - _focusDistance: 900
     - _g: -11.49
-    - _lightB: 0.30588233
-    - _lightG: 0.61922914
+    - _lightB: 0.6509434
+    - _lightG: 0.6281341
     - _lightIntensity: 1
-    - _lightR: 1
-    - _lightRange: 15.21
+    - _lightR: 0.5311944
+    - _lightRange: 1000
     - _lightX: 6.3
-    - _lightY: 10.67
-    - _lightZ: 4.2
+    - _lightY: -550
+    - _lightZ: 200
     - _r: -0.3
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}

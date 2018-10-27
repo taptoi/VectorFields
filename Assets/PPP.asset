@@ -71,11 +71,11 @@ MonoBehaviour:
   depthOfField:
     m_Enabled: 0
     m_Settings:
-      focusDistance: 76.9
-      aperture: 0.6
+      focusDistance: 0.1
+      aperture: 0.1
       focalLength: 300
-      useCameraFov: 1
-      kernelSize: 1
+      useCameraFov: 0
+      kernelSize: 3
   motionBlur:
     m_Enabled: 0
     m_Settings:
@@ -100,10 +100,10 @@ MonoBehaviour:
     m_Enabled: 0
     m_Settings:
       bloom:
-        intensity: 1.27
-        threshold: 0.2
+        intensity: 6.32
+        threshold: 0.31
         softKnee: 0.17
-        radius: 1.03
+        radius: 4.5
         antiFlicker: 0
       lensDirt:
         texture: {fileID: 0}
@@ -112,35 +112,35 @@ MonoBehaviour:
     m_Enabled: 1
     m_Settings:
       tonemapping:
-        tonemapper: 1
-        neutralBlackIn: 0.013
-        neutralWhiteIn: 6.5
-        neutralBlackOut: -0.044
-        neutralWhiteOut: 8.8
-        neutralWhiteLevel: 4.4
-        neutralWhiteClip: 5
+        tonemapper: 2
+        neutralBlackIn: -0.022
+        neutralWhiteIn: 7.6
+        neutralBlackOut: -0.079
+        neutralWhiteOut: 13.1
+        neutralWhiteLevel: 8.1
+        neutralWhiteClip: 7.83
       basic:
-        postExposure: 2.03
-        temperature: -11
-        tint: 13
-        hueShift: 24
-        saturation: 0.8
-        contrast: 1.56
+        postExposure: 5.94
+        temperature: 3
+        tint: 2
+        hueShift: 0
+        saturation: 1.3
+        contrast: 0.66
       channelMixer:
-        red: {x: 1, y: 0, z: 0}
+        red: {x: 1.03, y: 0, z: 0}
         green: {x: 0, y: 1, z: 0}
         blue: {x: 0, y: 0, z: 1}
         currentEditingChannel: 0
       colorWheels:
         mode: 1
         log:
-          slope: {r: 0.76914936, g: 0.98428065, b: 1, a: 0}
+          slope: {r: 1, g: 0.80369025, b: 0.9569675, a: 0}
           power: {r: 1, g: 1, b: 1, a: 0}
           offset: {r: 1, g: 1, b: 1, a: 0}
         linear:
-          lift: {r: 1, g: 1, b: 1, a: 0}
-          gamma: {r: 1, g: 1, b: 1, a: 0}
-          gain: {r: 1, g: 1, b: 1, a: 0}
+          lift: {r: 0, g: 0, b: 0, a: 0}
+          gamma: {r: 0, g: 0, b: 0, a: 0}
+          gain: {r: 0, g: 0, b: 0, a: 0}
       curves:
         master:
           curve:
@@ -156,28 +156,19 @@ MonoBehaviour:
               inWeight: 0
               outWeight: 0
             - serializedVersion: 3
-              time: 0.32286996
-              value: 0.5294118
-              inSlope: 1.9129908
-              outSlope: 1.9129908
+              time: 0.23986487
+              value: 0.442029
+              inSlope: 1
+              outSlope: 1
               tangentMode: 0
               weightedMode: 0
               inWeight: 0
               outWeight: 0
             - serializedVersion: 3
-              time: 0.69058293
-              value: 0.9019608
-              inSlope: 0.6726998
-              outSlope: 0.6726998
-              tangentMode: 0
-              weightedMode: 0
-              inWeight: 0
-              outWeight: 0
-            - serializedVersion: 3
-              time: 1
+              time: 0.97309417
               value: 1
-              inSlope: -0
-              outSlope: -0
+              inSlope: 1
+              outSlope: 1
               tangentMode: 0
               weightedMode: 0
               inWeight: 0
@@ -331,9 +322,9 @@ MonoBehaviour:
     m_Enabled: 0
     m_Settings:
       colored: 1
-      intensity: 0.5
-      size: 1
-      luminanceContribution: 0.8
+      intensity: 0.92
+      size: 3
+      luminanceContribution: 1
   vignette:
     m_Enabled: 0
     m_Settings:

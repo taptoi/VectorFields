@@ -37,6 +37,8 @@ public class VectorField : MonoBehaviour
     public float voronoiJitter = 1.1f;
     public int voronoiOctaves = 1;
     public float cameraSpeed = 0.5f;
+    public float focusDistance = 600;
+    public float dof = 200;
 
 
     private float[,,] fieldMatrix;
@@ -61,7 +63,7 @@ public class VectorField : MonoBehaviour
     /// <summary>
     /// Number of Particle created in the system.
     /// </summary>
-    private int particleCount = 128000;
+    private int particleCount = 25600;
 
     /// <summary>
     /// Material used to draw the Particle on screen.
@@ -178,7 +180,7 @@ public class VectorField : MonoBehaviour
             //float x = UnityEngine.Random.value * scaleX;
             //float y = UnityEngine.Random.value * scaleY;
             //float z = UnityEngine.Random.value * scaleZ;
-            Vector3 c = new Vector3(scaleX / 2, scaleY / 2, scaleZ / 2);
+            Vector3 c = new Vector3(scaleX * 100, scaleY / 2, scaleZ / 2);
             Vector3 xyz = new Vector3(1, 1, 1);
             // Rotate and scale vector within a sphere and center
             xyz = q * xyz * r + c; 
@@ -194,7 +196,7 @@ public class VectorField : MonoBehaviour
             particleArray[i].velocity.z = 0;
 
             // Initial life value
-            particleArray[i].life = 50 + UnityEngine.Random.value * 50;
+            particleArray[i].life = UnityEngine.Random.value * 20;
         }
 
         // create compute buffers
@@ -231,8 +233,10 @@ public class VectorField : MonoBehaviour
         material.SetFloat("_lightR", mainLight.color.r);
         material.SetFloat("_lightG", mainLight.color.g);
         material.SetFloat("_lightB", mainLight.color.b);
+        material.SetFloat("_focusDistance", focusDistance);
+        material.SetFloat("_dof", dof);
 
-        Graphics.DrawProcedural(MeshTopology.Points, 1, particleCount);
+        Graphics.DrawProcedural(MeshTopology.Triangles, 6, particleCount);
     }
 
     void OnRenderImage(RenderTexture src, RenderTexture dst)
